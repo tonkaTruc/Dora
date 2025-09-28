@@ -1,0 +1,18 @@
+# Cache and temporary files
+.pytest_cache/
+__pycache__/
+*.pyc
+
+# Project-specific directories
+tests/
+dumps/
+
+# Sensitive and environment-specific files
+.env
+
+# Git and Docker ignore files
+.gitignore
+.dockerignore
+
+# Dependency lock files
+*.lock

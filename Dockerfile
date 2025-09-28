@@ -4,7 +4,7 @@ FROM python:3.14.0rc3-alpine3.22
 WORKDIR /app
 
 # Copy the dora directory into the container
-COPY dora /app/dora
+COPY . /app/dora
 
 # Install uv
 RUN pip install --no-cache-dir --upgrade pip && \
