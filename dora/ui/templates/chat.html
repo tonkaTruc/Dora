@@ -3,27 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <title>Dora – Chat with Persona</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/dora-dark-overhaul.css') }}">
-<!-- Use Inter for UI, Fira Code for messages -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-    --bg-main: #181A1B;
-    --bg-secondary: #23272F;
-    --surface: #23272F;
-    --surface-hover: #282C34;
-    --border: #31343A;
-    --divider: #26292C;
-    --text-main: #EFF0F3;
-    --text-secondary: #B3B7BC;
-    --accent: #FF8C42;
-    --accent-light: #FFA868;
-    --accent-bg: rgba(255, 140, 66, 0.10);
-    --radius: 6px;
-    --font-size: 13px;
+    /* Orange accent is the same for both themes */
+    --accent: #FF6700;
+    --accent-dark: #CC5200;
+    --accent-light: #FF944D;
+    --accent-bg: rgba(255, 103, 0, 0.12);
+    --radius: 8px;
+    --font-size: 15px;
     --font-family-ui: 'Inter', 'Segoe UI', Arial, sans-serif;
-    --font-family-mono: 'Fira Code', monospace;
 }
+
+/* DARK THEME VARIABLES */
+body,
+body.theme-dark {
+    --bg-main: #141313;
+    --bg-secondary: #1A1918;
+    --surface: #181716;
+    --surface-hover: #22201e;
+    --border: #232222;
+    --divider: #232222;
+    --text-main: #F5F3EF;
+    --text-secondary: #8a8884;
+}
+
+/* LIGHT THEME VARIABLES */
+body.theme-light {
+    --bg-main: #FAF9F6;
+    --bg-secondary: #F5F3EF;
+    --surface: #FFFFFF;
+    --surface-hover: #F7F6F4;
+    --border: #E2E1E0;
+    --divider: #DEDCD9;
+    --text-main: #1A120B;
+    --text-secondary: #544E45;
+}
+
+/* Base styles */
 html, body {
     height: 100%;
     margin: 0;
@@ -31,8 +50,9 @@ html, body {
     background: var(--bg-main);
     color: var(--text-main);
     font-size: var(--font-size);
-    letter-spacing: 0.01em;
     box-sizing: border-box;
+    letter-spacing: 0.01em;
+    transition: background 0.28s, color 0.18s;
 }
 body {
     min-height: 100vh;
@@ -42,86 +62,129 @@ body {
     align-items: stretch;
     padding: 0;
 }
+
+/* Metro-inspired scrollbar */
+body, .messages {
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) var(--surface);
+}
+body::-webkit-scrollbar,
+.messages::-webkit-scrollbar {
+    width: 12px;
+    background: var(--surface);
+}
+body::-webkit-scrollbar-track,
+.messages::-webkit-scrollbar-track {
+    background: var(--surface);
+    border-radius: var(--radius);
+}
+body::-webkit-scrollbar-thumb,
+.messages::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: var(--radius);
+    border: 2px solid var(--surface);
+    min-height: 32px;
+    transition: background 0.2s;
+}
+body::-webkit-scrollbar-thumb:hover,
+.messages::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-dark);
+}
+body::-webkit-scrollbar-corner,
+.messages::-webkit-scrollbar-corner {
+    background: var(--surface);
+}
+
+/* Main chat container */
 .chat-container {
     background: var(--surface);
     width: 98vw;
-    max-width: 1100px;
+    max-width: 960px;
     height: 97vh;
     margin: auto;
     display: flex;
     flex-direction: column;
     border-radius: var(--radius);
-    box-shadow: 0 4px 32px 0 rgba(0,0,0,0.18);
+    border: 1.5px solid var(--border);
     overflow: hidden;
-    border: 1.5px solid var(--divider);
 }
+
+/* Top bar */
 .top-panel {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 32px;
+    padding: 18px 32px;
     background: var(--bg-secondary);
     border-bottom: 1.5px solid var(--divider);
     min-height: 56px;
+    gap: 12px;
 }
 .top-panel .logo-emoji {
     font-size: 28px;
-    margin-right: 12px;
+    margin-right: 14px;
 }
 .top-panel .title-text {
     font-size: 1.35em;
-    font-weight: 600;
-    color: var(--accent);
-    letter-spacing: 0.02em;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: 0.04em;
     flex: 1;
+    text-transform: uppercase;
+}
+.top-panel .config-buttons {
+    display: flex;
+    gap: 8px;
 }
 .top-panel .config-buttons button {
-    background: var(--accent-bg);
+    background: none;
     color: var(--accent);
-    border: 1.5px solid var(--accent);
+    border: none;
     border-radius: var(--radius);
-    font-size: 12px;
+    font-size: 14px;
     font-family: var(--font-family-ui);
-    font-weight: 500;
+    font-weight: 600;
     padding: 7px 18px;
-    margin-left: 8px;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    transition: background 0.18s, color 0.18s;
 }
-.top-panel .config-buttons button:hover {
-    background: var(--accent);
-    color: var(--bg-main);
-    border-color: var(--accent-light);
+.top-panel .config-buttons button:hover,
+.top-panel .config-buttons button:focus {
+    background: var(--accent-bg);
+    color: var(--accent-light);
+    outline: none;
 }
+
+/* Messages area */
 .messages {
     flex: 1 1 auto;
-    padding: 24px 42px 24px 42px;
+    padding: 28px 48px 24px 48px;
     overflow-y: auto;
     background: var(--surface);
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    gap: 14px;
 }
 .message {
-    font-family: var(--font-family-mono);
-    font-size: 13px;
-    line-height: 1.5;
-    max-width: 70%;
+    font-size: 15px;
+    line-height: 1.65;
+    max-width: 66%;
     margin: 0;
-    padding: 12px 18px;
+    padding: 14px 20px;
     border-radius: var(--radius) var(--radius) var(--radius) 0;
-    box-shadow: 0 1.5px 6px 0 rgba(0,0,0,0.07);
     word-break: break-word;
     white-space: pre-wrap;
-    transition: background 0.15s;
-    border: 1px solid transparent;
+    border: 1.5px solid transparent;
+    background: var(--bg-secondary);
+    color: var(--text-main);
+    transition: background 0.15s, color 0.15s;
 }
 .user {
-    background: var(--accent);
-    color: var(--bg-main);
+    background: var(--accent-bg);
+    color: var(--accent);
     align-self: flex-end;
     border-bottom-right-radius: 0;
-    border: 1.5px solid var(--accent-light);
+    border: 1.5px solid var(--accent);
 }
 .bot {
     background: var(--surface-hover);
@@ -130,74 +193,135 @@ body {
     border-bottom-left-radius: 0;
     border: 1.5px solid var(--divider);
 }
+
+/* Input area */
 .input-area {
     display: flex;
     border-top: 1.5px solid var(--divider);
     background: var(--bg-secondary);
-    padding: 0 16px 0 16px;
-    min-height: 56px;
+    padding: 0 20px;
+    min-height: 64px;
     align-items: center;
     gap: 12px;
 }
 .input-area input {
     flex: 1;
-    padding: 13px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
+    padding: 15px 16px 13px 16px;
+    border: none;
+    border-bottom: 2.5px solid var(--border);
+    border-radius: 0;
     background: var(--surface);
     color: var(--text-main);
-    font-size: 13px;
-    font-family: var(--font-family-mono);
+    font-size: 15px;
+    font-family: var(--font-family-ui);
     outline: none;
     margin: 0;
-    transition: border-color 0.15s;
+    transition: border-color 0.18s, background 0.18s, color 0.18s;
 }
 .input-area input:focus {
-    border-color: var(--accent);
+    border-bottom: 2.5px solid var(--accent);
+    background: var(--surface-hover);
 }
 .input-area button {
-    padding: 12px 20px;
+    padding: 13px 28px;
     border-radius: var(--radius);
-    border: 1.5px solid var(--accent);
-    background: var(--accent-bg);
-    color: var(--accent);
-    font-size: 13px;
-    font-weight: 600;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
     font-family: var(--font-family-ui);
     cursor: pointer;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    transition: background 0.15s, color 0.15s;
+    box-shadow: none;
 }
-.input-area button:hover {
-    background: var(--accent);
+.input-area button:hover,
+.input-area button:focus {
+    background: var(--accent-dark);
     color: var(--bg-main);
-    border-color: var(--accent-light);
 }
+
+/* Toast notification (hidden by default) */
+.toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 16px 36px;
+    border-radius: var(--radius);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 1001;
+}
+.toast.visible { opacity: 1; pointer-events: auto; }
+
+/* Responsive adjustments */
 @media (max-width: 900px) {
     .chat-container { max-width: 100vw; width: 100vw; }
     .messages { padding: 14px 4vw 14px 4vw; }
     .top-panel { padding: 12px 8px; }
     .input-area { padding: 0 6px; }
 }
+@media (max-width: 600px) {
+    .messages { padding: 6vw 2vw 6vw 2vw; }
+    .chat-container { min-height: 100vh; }
+    .top-panel { min-height: 44px; }
+}
 </style>
 </head>
 <body>
 <div class="chat-container">
     <div class="top-panel">
-        <span class="logo-emoji">🎒</span>
+        <span class="logo-emoji" aria-label="Dora Logo">🎒</span>
         <span class="title-text">Dora</span>
         <div class="config-buttons">
-            <button onclick="openSettings()">Settings</button>
+            <button onclick="openSettings()" aria-label="Settings">Settings</button>
+            <button id="theme-toggle" aria-label="Toggle light/dark theme">🌗 Theme</button>
         </div>
     </div>
-    <div id="messages" class="messages"></div>
+    <div id="messages" class="messages" aria-live="polite" role="log"></div>
     <div class="input-area">
-        <input id="user-input" type="text" placeholder="Type your message..." autocomplete="off" />
-        <button onclick="sendMessage()">Send</button>
+        <input id="user-input" type="text" placeholder="Type your message..." autocomplete="off" aria-label="Message input" />
+        <button onclick="sendMessage()" aria-label="Send message">Send</button>
     </div>
 </div>
+<div id="toast" class="toast" role="alert"></div>
 <script>
 const messagesDiv = document.getElementById("messages");
 const userInput = document.getElementById("user-input");
+const toast = document.getElementById("toast");
+const themeToggle = document.getElementById("theme-toggle");
+
+// Theme logic
+function setTheme(theme) {
+    document.body.classList.remove('theme-dark', 'theme-light');
+    document.body.classList.add('theme-' + theme);
+    localStorage.setItem('dora-theme', theme);
+    themeToggle.textContent = theme === 'dark' ? '🌗 Light' : '🌗 Dark';
+}
+function toggleTheme() {
+    const current = document.body.classList.contains('theme-light') ? 'light' : 'dark';
+    const next = current === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+}
+// On load, set theme
+(function() {
+    const stored = localStorage.getItem('dora-theme');
+    if (stored === 'light' || stored === 'dark') {
+        setTheme(stored);
+    } else {
+        // Auto-detect preference
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setTheme(prefersDark ? 'dark' : 'light');
+    }
+})();
+themeToggle.onclick = toggleTheme;
+
 window.onload = () => {
     const saved = localStorage.getItem("chatHistory");
     if (saved) messagesDiv.innerHTML = saved;
@@ -206,7 +330,7 @@ function saveHistory() {
     localStorage.setItem("chatHistory", messagesDiv.innerHTML);
 }
 function openSettings() {
-    alert("Settings panel coming soon!");
+    showToast("Settings panel coming soon!");
 }
 function addMessage(text, sender) {
     const msgDiv = document.createElement("div");
@@ -238,6 +362,7 @@ async function sendMessage() {
     } catch (e) {
         messagesDiv.removeChild(typingDiv);
         addMessage("Error: Could not connect to server.", "bot");
+        showToast("Network error. Please try again.");
     }
 }
 userInput.addEventListener("keydown", e => {
@@ -246,6 +371,11 @@ userInput.addEventListener("keydown", e => {
         sendMessage();
     }
 });
+function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add("visible");
+    setTimeout(() => toast.classList.remove("visible"), 2200);
+}
 </script>
 </body>
 </html>
