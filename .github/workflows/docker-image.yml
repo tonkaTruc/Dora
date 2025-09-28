@@ -25,4 +25,4 @@ jobs:
         context: .
         file: Dockerfile
         push: true
-        tags: ghcr.io/${{ toLower(github.repository_owner) }}/doraexp:latest
+        tags: ghcr.io/tonkatruc/dora:latest
