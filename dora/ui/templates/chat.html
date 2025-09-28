@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+<title>Chat with Persona</title>
+<style>
+body {
+    font-family: 'Fira Code', monospace;
+    background: #121212;
+    color: #f4f4f9;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    height: 100vh;
+    margin: 0;
+}
+
+.chat-container {
+    background: #1e1e1e;
+    width: 100%;          /* full width on smaller screens */
+    max-width: 600px;     /* limit width for readability */
+    display: flex;
+    flex-direction: column;
+    border-radius: 0;     /* optional: flush edges */
+    height: 100%;         /* fill height of viewport */
+    overflow: hidden;
+}
+.top-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background: #1a1a1a;
+    border-bottom: 1px solid #333;
+}
+
+.top-panel .logo-emoji {
+    font-size: 24px;       
+    margin-right: 8px;
+}
+
+.top-panel .title-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #f4f4f9;
+    flex: 1; /* ensures title takes available space */
+}
+
+.top-panel .config-buttons button {
+    background: #4e8cff;
+    border: none;
+    color: #fff;
+    padding: 6px 10px;
+    margin-left: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.top-panel .config-buttons button:hover {
+    background: #3573d6;
+}
+.messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+}
+.message {
+    font-family: 'Fira Code', monospace;
+    font-size: 14px;       /* matches input size */
+    line-height: 1.4;
+    margin: 8px 0;
+    padding: 10px;
+    border-radius: 8px;
+    max-width: 80%;
+    word-wrap: break-word;
+    white-space: pre-wrap; /* preserve line breaks */
+}
+.user { background: #4e8cff; color: white; align-self: flex-end; }
+.bot { background: #333; color: #f4f4f9; align-self: flex-start; }
+.input-area {
+    display: flex;
+    border-top: 1px solid #333;
+}
+.input-area input {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    outline: none;
+    background: #1e1e1e;
+    color: #f4f4f9;
+}
+.input-area button {
+    padding: 12px 16px;
+    border: none;
+    background: #4e8cff;
+    color: white;
+    cursor: pointer;
+}
+.input-area button:hover { background: #3573d6; }
+</style>
+</head>
+<body>
+<div class="chat-container">
+    <div class="top-panel">
+        <span class="logo-emoji">🎒</span>
+        <span class="title-text">Dora</span>
+        <div class="config-buttons">
+            <button onclick="openSettings()">Settings</button>
+        </div>
+    </div>
+
+
+    <div id="messages" class="messages"></div>
+    <div class="input-area">
+        <input id="user-input" type="text" placeholder="Type your message..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+const messagesDiv = document.getElementById("messages");
+const userInput = document.getElementById("user-input");
+
+// Load history
+window.onload = () => {
+    const saved = localStorage.getItem("chatHistory");
+    if (saved) messagesDiv.innerHTML = saved;
+};
+
+function saveHistory() {
+    localStorage.setItem("chatHistory", messagesDiv.innerHTML);
+}
+
+function toggleDarkMode() {
+    document.body.classList.toggle("dark");
+}
+
+function openSettings() {
+    alert("Settings panel coming soon!");
+}
+
+function addMessage(text, sender) {
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("message", sender);
+    msgDiv.textContent = text;
+    messagesDiv.appendChild(msgDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    saveHistory();
+}
+
+async function sendMessage() {
+    const message = userInput.value.trim();
+    if (!message) return;
+    addMessage(message, "user");
+    userInput.value = "";
+
+    const typingDiv = document.createElement("div");
+    typingDiv.classList.add("message", "bot");
+    typingDiv.textContent = "Thinking...";
+    messagesDiv.appendChild(typingDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    try {
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({message})
+        });
+        const data = await response.json();
+        messagesDiv.removeChild(typingDiv);
+        addMessage(data.response || "No response from server.", "bot");
+    } catch (e) {
+        messagesDiv.removeChild(typingDiv);
+        addMessage("Error: Could not connect to server.", "bot");
+    }
+}
+
+// Enter sends message, Shift+Enter creates newline
+userInput.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+</script>
+</body>
+</html>
