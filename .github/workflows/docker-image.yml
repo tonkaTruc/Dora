@@ -7,9 +7,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -27,4 +25,4 @@ jobs:
         context: .
         file: Dockerfile
         push: true
-        tags: ghcr.io/${{ github.repository_owner }}/doraexp:latest
+        tags: ghcr.io/${{ toLower(github.repository_owner) }}/doraexp:latest
