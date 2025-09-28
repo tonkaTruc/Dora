@@ -18,7 +18,6 @@ class NumberTool:
         }
 
     def __call__(self, first: int, second: int) -> str:
-        print(f"Mixing integers: {first} and {second}")
         return str(int(first) + int(second))
 
     @property
