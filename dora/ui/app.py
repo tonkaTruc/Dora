@@ -22,7 +22,6 @@ def chat():
 
     response = persona.request_w_tools(user_message)
     resp_text = get_text_from_response(response)
-    # print(json.dumps(response, indent=4))
     return jsonify({
         "response": resp_text
     })
