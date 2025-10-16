@@ -20,8 +20,8 @@ def remove_test_file():
 
 def test_write_a_file(persona):
 
-    prompt = f"""
-        Write a file called test.txt using tools. The file should contain the 
+    prompt = """
+        Write a file called test.txt using tools. The file should contain the
         text Hello, World! and then give me the filename in a final answer.
     """
     response = persona.request_w_tools(prompt)
