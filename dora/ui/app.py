@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, render_template
 from dora.persona.basic import BasicPersona, get_text_from_response
 import logging
-import json
 
 
 persona = BasicPersona(name="TestUser", description="A test user persona.")
@@ -23,7 +22,6 @@ def chat():
 
     response = persona.request_w_tools(user_message)
     resp_text = get_text_from_response(response)
-    
     # print(json.dumps(response, indent=4))
     return jsonify({
         "response": resp_text
